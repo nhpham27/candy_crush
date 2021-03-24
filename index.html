@@ -1,7 +1,7 @@
 <!--
 CandyCrush
-Your Name:
-Collaborators:
+Your Name: Nguyen Hoa Pham - npham30
+Collaborators: None
 -->
 <!DOCTYPE html>
 <html>
@@ -14,7 +14,7 @@ Collaborators:
 <head>
 <meta charset="utf-8">
 <title>CandyCrush</title>
-
+<link rel="shortcut icon" href="#">
 <!-- Load style sheets -->
 <link rel="stylesheet" href=
   "https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.css">
@@ -67,6 +67,8 @@ var DEFAULT_BOARD_SIZE = 8;
 // data model at global scope for easier debugging
 var board;
 var rules;
+var letters = ['a','b','c','d','e','f','g','h'];
+var selectedCandy, selectedMove;
 
 // initialize board
 if ($.getUrlVar('size') && $.getUrlVar('size') >= 3) {
@@ -82,29 +84,74 @@ rules = new Rules(board);
 // runs at the end of start-up when the page has finished loading.
 $(document).ready(function()
 {
-  // Your code here.
+  generateTable();
+  rules.prepareNewGame();
+
+  $(".controlButton").on("click", moveCandy);
+
 });
 
 
 /* Event Handlers */
+// generate table
+function generateTable(){
+  $("#candyTable").empty();
+  for(var i = 0; i < 8;i++){
+    $("#candyTable").append("<tr> </tr>");
+    for(var j = 0; j < 8; j++){
+      var temp = "<td id=\"" + letters[j] + (i+1) + "\">" + letters[j] + (i+1) + "</td>";
+      $("#candyTable tr:last").append(temp);
+    }
+  }
+}
+
 // access the candy object with info.candy
 
 // add a candy to the board
 $(board).on('add', function(e, info)
 {
   // Your code here.
+  var candy = info.candy;
+  var candyId = "#" + String.fromCharCode(97 + candy.col) + (candy.row+1);
+  if(candy.color == "yellow"){
+    $(candyId).css({"background-color":candy.color, "color":"black"});
+  }
+  else{
+    $(candyId).css({"background-color":candy.color, "color":"white"});
+  }
 });
 
 // move a candy on the board
 $(board).on('move', function(e, info)
 {
   // Your code here.
+
+  // get from and to candies' ID
+  var fromCandyId = "#" + String.fromCharCode(97 + info.fromCol) + (info.fromRow + 1);
+  var toCandyId = "#" + String.fromCharCode(97 + info.toCol) + (info.toRow + 1);
+
+  // get from and to candies' previous colors
+  var toColor = board.getCandyAt(info.toRow, info.toCol).color;
+  var fromColor = info.candy.color;
+  
+  // swap colors
+  $(toCandyId).css({"background-color":fromColor});
+  if(fromColor == "yellow"){
+    $(toCandyId).css({"background-color":fromColor, "color":"black"});
+  }
+  else{
+    $(toCandyId).css({"background-color":fromColor, "color":"white"});
+  }
+
 });
 
 // remove a candy from the board
 $(board).on('remove', function(e, info)
 {
   // Your code here.
+  var candy = info.candy;
+  var candyId = "#" + String.fromCharCode(97 + info.fromCol) + (info.fromRow+1);
+  $(candyId).css({"background-color":"white", "color":"white"});
 });
 
 // move a candy on the board
@@ -113,15 +160,81 @@ $(board).on('scoreUpdate', function(e, info)
   // Your code here. To be implemented in pset 2.
 });
 
+function moveCandy(){
+  var direction = $(this).attr('id');
+
+  //enable the crush once button
+  $("#crushBtn").attr("disabled",false);
+
+  direction = direction.substring(0, direction.indexOf('B'));
+
+  var toCandy = board.getCandyInDirection(selectedCandy, direction);
+  board.flipCandies(selectedCandy, toCandy);
+
+  selectedCandy = toCandy;
+  $(".controlButton").attr("disabled", true);
+  $(".controlButton").removeClass("selectedBtn");
+}
+
 // Button Events
-$(document).on('click', "#buttonIDhere", function(evt)
+$(document).on('click', "#crushBtn", function(evt)
 {
   // Your code here.
+  var candiesToCrush =  rules.getCandyCrushes();
+  rules.removeCrushes(candiesToCrush);
+  $("#crushBtn").attr("disabled",true);
+  setTimeout(function(){ 
+    rules.moveCandiesDown();
+    // disable crush once button if there is no candies to crush
+    if(rules.getCandyCrushes().length  > 0){
+      $("#crushBtn").attr("disabled",false);
+    } 
+    else{
+      $("#crushBtn").attr("disabled",true);
+    }
+  }, 500);
+});
+
+$(document).on('click', "#newGameBtn", function(evt)
+{
+  // Your code here.
+  board.clear();
+  rules.prepareNewGame();
 });
 
 // keyboard events arrive here
 $(document).on('keydown', function(evt) {
   // Your code here.
+});
+
+$(document).on('keyup', "#inputText" , function(evt) {
+  // Your code here.
+  var str = this.value.toLowerCase();
+
+  // disable the buttons
+  $(".controlButton").attr("disabled",true);
+  $(".controlButton").removeClass("selectedBtn");
+
+  if(str.length == 2){
+    var tempCol = -1;
+    for(var i = 0; i < 8; i++){
+      if(str.charAt(0) == letters[i])
+        tempCol = i;
+    }
+    
+    var tempRow = parseInt(str.charAt(1)) - 1;
+
+    selectedCandy = board.getCandyAt(tempRow, tempCol);
+
+    var directions = ["up", "down", "left", "right"];
+
+			directions.forEach(function(e){
+				if(rules.isMoveTypeValid(selectedCandy, e)){
+					$("#" + e + "Btn").attr("disabled",false);
+          $("#" + e + "Btn").addClass("selectedBtn");
+				}
+			});
+  }
 });
 
 
@@ -134,25 +247,33 @@ $(document).on('keydown', function(evt) {
 
 <div class="container">
   <div class="row">
-    <div class="col-md-4" id="firstColumn">
-      <div>
-      <!-- Column 1 Code Here -->
-      Column 1
-
+    <div class="col-md-3" id="firstColumn">
+      <div id="firstBox">
+        <!-- Column 1 Code Here -->
+        <h3 id="candyCrush"><b>Candy<br>Crush</b></h3>
+        <input id="newGameBtn" type="button" class="btn" value="New Game">
       </div>
   </div>
 
-    <div class="col-md-4" id="mainColumn">
+    <div class="col-md-6 " id="mainColumn" resizable>
 
       <!-- Column 2 Code Here -->
-      Column 2
+      <table id="candyTable" ></table>
 
     </div>
 
-    <div class="col-md-4" id="lastColumn">
+    <div class="col-md-3" id="lastColumn">
 
       <!-- Column 3 Code Here -->
-      Column 3
+      <div id="controlBox">
+        <p style="display: inline;">Move: </p>
+        <input id="inputText" type="text" style="width:40px; display: inline;"><br>
+        <input id="upBtn" type="button" class="btn controlButton" value="↑" style="margin-top: 20px;" disabled><br>
+        <input id="leftBtn" type="button" class="btn controlButton margin-right-20px" value="←" disabled>
+        <input id="rightBtn" type="button" class="btn controlButton margin-left-20px" value="→" disabled><br>
+        <input id="downBtn" type="button" class="btn controlButton" value="↓" disabled><br>
+        <input id="crushBtn" type="button" class="btn" value="Crush Once" style="margin-top: 20px;" disabled> 
+      </div>
 
     </div>
   </div> <!-- class="row" -->

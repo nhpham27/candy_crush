@@ -3,9 +3,90 @@
  */
 
 /* REMOVE ME - dashed lines and height for debugging */
-#mainColumn {
-  outline: 1px dashed orange;
-  height: 200px;
+.container {
+  width: 100vw;
+  height: auto;
 }
 
+#firstColumn {
+  height: auto;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#mainColumn {
+  height: auto;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#lastColumn {
+  height: auto;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+
+
 /* Your css code here! */
+
+.align-center {
+  text-align: center;
+}
+
+#candyCrush {
+  color: red;
+  padding: 10px;
+  margin: auto;
+}
+
+#firstBox {
+}
+
+#controlBox {
+  margin: auto;
+}
+
+.margin-left-20px {
+  margin-left: 20px;
+}
+
+.margin-right-20px {
+  margin-right: 20px;
+}
+
+.controlButton {
+  width: 40px;
+  height: 40px;
+  background-color: rgb(190, 180, 180);
+}
+
+#crushBtn{
+  background-color: rgb(190, 180, 180);
+}
+
+#candyTable {
+  width:320px; 
+  height:320px;
+  margin:20px;
+}
+
+#candyTable td {
+  width:40px; 
+  height:40px;
+}
+
+.selectedBtn {
+  background-color: blue;
+  color: white;
+}
+
+
+
+
