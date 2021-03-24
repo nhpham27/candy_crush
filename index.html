@@ -174,6 +174,8 @@ function moveCandy(){
   selectedCandy = toCandy;
   $(".controlButton").attr("disabled", true);
   $(".controlButton").removeClass("selectedBtn");
+  $("#inputText").attr("disabled",true);
+  $("#inputText").val("");
 }
 
 // Button Events
@@ -191,6 +193,8 @@ $(document).on('click', "#crushBtn", function(evt)
     } 
     else{
       $("#crushBtn").attr("disabled",true);
+      $("#inputText").attr("disabled",false);
+      $("#inputText").focus();
     }
   }, 500);
 });
