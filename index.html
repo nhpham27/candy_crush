@@ -89,6 +89,8 @@ $(document).ready(function()
 
   $(".controlButton").on("click", moveCandy);
 
+  // focus on the input text
+  $("#inputText").focus();
 });
 
 
@@ -204,6 +206,9 @@ $(document).on('click', "#newGameBtn", function(evt)
   // Your code here.
   board.clear();
   rules.prepareNewGame();
+
+  // focus on the input text
+  $("#inputText").focus();
 });
 
 // keyboard events arrive here
