@@ -1,6 +1,7 @@
 # candy_crush
+A basic version of candy crush game
 
-# How to run
+### How to run
 1. Install python 3 in the system
 2. Open the terminal, navigate to the folder contains all the files included index.html
 3. run command: python -m http.server
